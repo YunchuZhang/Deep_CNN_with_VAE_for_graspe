@@ -28,7 +28,7 @@ criterion.cuda()
 
 optimizer = torch.optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
 losses = []
-
+epoches = 100
 for i in range(epoches):
     loss = 0
     optimizer.zero_grad()#清空上一步的梯度
