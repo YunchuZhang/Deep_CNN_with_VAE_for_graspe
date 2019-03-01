@@ -44,8 +44,8 @@ for i in range(epoches):
     optimizer.step()
 
     if (i +1)%10 == 0:
-        print('Loss at epoch[%s]: %.3f' % (i, loss.data[0]))
-    losses.append(loss.data[0])
+        print('Loss at epoch[%s]: %.3f' % (i, loss.data[-1]))
+    losses.append(loss.data[-1])
 
 plt.plot(losses, '-or')
 plt.xlabel("Epoch")
