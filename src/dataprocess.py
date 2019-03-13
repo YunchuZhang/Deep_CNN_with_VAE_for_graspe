@@ -11,7 +11,7 @@ import shapely
 from shapely.geometry import Polygon,MultiPoint
 from img import imgshow
 
-root = ''
+root = '/home/yunchu/Workspace/Deep_CNN_with_VAE_for_graspe/data/'
 
 def makeid():
 	with open("id.txt","w") as f:
@@ -55,7 +55,7 @@ class MyDataset(torch.utils.data.Dataset):
 	def __getitem__(self, index):
 		fn, labeltxt = self.imgs[index]
 		img = Image.open(root+fn).convert('RGB')
-		label = boxtolabel(labeltxt)
+		label = boxtolabel(root+labeltxt)
 		if self.transform is not None:
 			img = self.transform(img)
 		return img,label
@@ -76,4 +76,5 @@ def test():
 
 if __name__ == '__main__':
 	test()
+	#makeid()
 
