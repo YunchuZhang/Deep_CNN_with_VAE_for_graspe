@@ -18,7 +18,7 @@ def makeid():
 		for i in range(100):
 			a = "pcd0"+"{}".format(100 + i)
 			f.write(a)
-			f.write(' ')
+			f.write('\n')
 
 def boxtolabel(labeltxt):
 	a = np.loadtxt(labeltxt)
