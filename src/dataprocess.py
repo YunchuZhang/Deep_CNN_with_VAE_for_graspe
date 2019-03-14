@@ -11,7 +11,17 @@ import shapely
 from shapely.geometry import Polygon,MultiPoint
 from img import imgshow
 
-root = '/home/yunchu/Workspace/Deep_CNN_with_VAE_for_graspe/data/'
+root = ''
+def list2tensor(labels):
+	label = torch.zeros([len(labels),labels[0].shape[0],4,2])
+	for k in range(len(labels)):
+		for j in range(labels[0].shape[0]):
+			label[k,j,:,:] = labels[k][j]
+	label = torch.transpose(label,0,1)
+	#print(label)
+	#print(label.shape)
+	return(label)
+
 
 def makeid():
 	with open("id.txt","w") as f:
@@ -55,7 +65,7 @@ class MyDataset(torch.utils.data.Dataset):
 	def __getitem__(self, index):
 		fn, labeltxt = self.imgs[index]
 		img = Image.open(root+fn).convert('RGB')
-		label = boxtolabel(root+labeltxt)
+		label = boxtolabel(labeltxt)
 		if self.transform is not None:
 			img = self.transform(img)
 		return img,label
@@ -64,17 +74,19 @@ class MyDataset(torch.utils.data.Dataset):
 def test():
 	train_data=MyDataset(root=root,datatxt ='id.txt', transform=transforms.ToTensor())
 #test_data=MyDataset(txt=root+'test.txt', transform=transforms.ToTensor())
-	train_loader = Data.DataLoader(dataset=train_data, batch_size=99, shuffle=False)
+	train_loader = Data.DataLoader(dataset=train_data, batch_size=96, shuffle=False)
 	for i, data in enumerate(train_loader):
 		imgs, labels= data
 		if i==1:
 			print(labels)
+			newlabel = list2tensor(labels)
+			print(newlabel)
+			print(newlabel[0,:])
 			img = transforms.ToPILImage()(imgs[0])
-			img.show()
+			#img.show()
 			#imgshow(imgs[0])
 			
 
 if __name__ == '__main__':
 	test()
-	#makeid()
 
