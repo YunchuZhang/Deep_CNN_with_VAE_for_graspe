@@ -7,6 +7,8 @@ from torch.optim import lr_scheduler
 from dataprocess import *
 from torchvision import models
 import time
+import copy
+
 # torch.manual_seed(1)
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 mse = nn.MSELoss()
@@ -73,7 +75,7 @@ def acc(y,label,batch):
 		count = len([l for l in iousavetotal if l > 0.75])
 		total = total + count/newlabel.size(1)*1.0 
 		iousavetotal = []
-	
+
 	#print(total)
 	return(total)
 
@@ -83,14 +85,18 @@ def train():
 	##input batch*3*480*640
 	##output batch*25*4*2  batch*200
 	#
-	
-	best_acc = 0.0
-
 	since = time.time()
+
+	best_acc = 0.0
+	
+
+	
 	
 	model = models.resnet34(pretrained = True)
 	fc_features = model.fc.in_features
 	model.fc = nn.Linear(fc_features,200)
+
+	best_model_wts = copy.deepcopy(model.state_dict())
 
 	if (GPU):
 		model = model.to(device)

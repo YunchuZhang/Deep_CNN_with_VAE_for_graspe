@@ -18,7 +18,7 @@ def caliou(box1,box2):
 		iou = 0.0
 	else:
 		iou = poly1.intersection(poly2).area / poly1.union(poly2).area
-	print(iou)
+	#print(iou)
 	return(iou)
 
 def imgshowbox(imgfile):
