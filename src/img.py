@@ -15,10 +15,11 @@ def caliou(box1,box2):
 	poly2 = Polygon(box2).convex_hull  
 	#print(poly2)
 	if not poly1.intersects(poly2): #如果两四边形不相交
-		iou = 0
+		iou = 0.0
 	else:
 		iou = poly1.intersection(poly2).area / poly1.union(poly2).area
 	print(iou)
+	return(iou)
 
 def imgshowbox(imgfile):
 	img = cv2.imread("{}.png".format(imgfile)) 

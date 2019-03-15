@@ -9,9 +9,9 @@ import cv2
 import numpy as np
 import shapely
 from shapely.geometry import Polygon,MultiPoint
-from img import imgshow
+from img import imgshow,caliou
 
-root = ''
+root = '/home/yunchu/Workspace/Deep_CNN_with_VAE_for_graspe/data2/'
 def list2tensor(labels):
 	label = torch.zeros([len(labels),labels[0].shape[0],4,2])
 	for k in range(len(labels)):
@@ -37,11 +37,11 @@ def boxtolabel(labeltxt):
 	#print(a.shape[0])
 	for i in range(a.shape[0]):
 		if i%4 ==0:
-			print("Processing %d box" %(i/4+1))
+			#print("Processing %d box" %(i/4+1))
 			box = [a[i],a[i+1],a[i+2],a[i+3]]
 			box = np.int0(box)
 			boxes.append(box)
-			print(box)
+			#print(box)
 	return(boxes)
 
 #"pcd0"+"{}".format(100 + i) + "r.png"
@@ -65,7 +65,7 @@ class MyDataset(torch.utils.data.Dataset):
 	def __getitem__(self, index):
 		fn, labeltxt = self.imgs[index]
 		img = Image.open(root+fn).convert('RGB')
-		label = boxtolabel(labeltxt)
+		label = boxtolabel(root+labeltxt)
 		if self.transform is not None:
 			img = self.transform(img)
 		return img,label
@@ -74,19 +74,22 @@ class MyDataset(torch.utils.data.Dataset):
 def test():
 	train_data=MyDataset(root=root,datatxt ='id.txt', transform=transforms.ToTensor())
 #test_data=MyDataset(txt=root+'test.txt', transform=transforms.ToTensor())
-	train_loader = Data.DataLoader(dataset=train_data, batch_size=96, shuffle=False)
+	train_loader = Data.DataLoader(dataset=train_data, batch_size=840, shuffle=False)
 	for i, data in enumerate(train_loader):
 		imgs, labels= data
 		if i==1:
 			print(labels)
 			newlabel = list2tensor(labels)
 			print(newlabel)
-			print(newlabel[0,:])
+			print(newlabel.size())
+			caliou(newlabel[0,1].numpy(),newlabel[0,2].numpy())
+			print(imgs.size())
 			img = transforms.ToPILImage()(imgs[0])
 			#img.show()
 			#imgshow(imgs[0])
 			
 
 if __name__ == '__main__':
+	#makeid()
 	test()
 
