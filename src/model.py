@@ -14,18 +14,20 @@ from tensorboardX import SummaryWriter
 writer = SummaryWriter(log_dir='scalar')
 
 
-
+#dataseg 700 175 batch 25
+#580 260 45
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 mse = nn.MSELoss()
-EPOCH = 500
-BATCH_SIZE = 25
+EPOCH = 1000
+BATCH_SIZE = 20
 #0.001 0.0003
 LR = 0.0035
 GPU = True
-train_size = 700
-val_size = 175
+train_size = 580
+val_size = 260
+#test_size = 
 
-
+# id1 train id2 val id3 test
 train_data=MyDataset(root=root,datatxt ='id1.txt', transform=transforms.ToTensor())
 train_loader = Data.DataLoader(dataset=train_data, batch_size=BATCH_SIZE, shuffle=True)
 
@@ -57,7 +59,7 @@ class CNN(nn.Module):
 def mseloss(y,label,batch):
 
 	newlabel = label
-	newlabel = torch.reshape(newlabel,(batch,16))
+	newlabel = torch.reshape(newlabel,(batch,24))
 	newlabel = newlabel.to(torch.float)
 	y_n = y.to(torch.float)
 
@@ -99,7 +101,7 @@ def train():
 	
 	model = models.resnet34(pretrained = False)
 	fc_features = model.fc.in_features
-	model.fc = nn.Linear(fc_features,16)
+	model.fc = nn.Linear(fc_features,24)
 
 	best_model_wts = copy.deepcopy(model.state_dict())
 
