@@ -18,14 +18,15 @@ writer = SummaryWriter(log_dir='scalar')
 #580 260 45
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 mse = nn.MSELoss()
-EPOCH = 1000
+EPOCH = 650
 BATCH_SIZE = 20
 #0.001 0.0003
 LR = 0.0035
 GPU = True
 train_size = 580
 val_size = 260
-#test_size = 
+tesize = 45
+
 
 # id1 train id2 val id3 test
 train_data=MyDataset(root=root,datatxt ='id1.txt', transform=transforms.ToTensor())
@@ -35,7 +36,8 @@ val_data=MyDataset(root=root,datatxt ='id2.txt', transform=transforms.ToTensor()
 val_loader = Data.DataLoader(dataset=val_data, batch_size=BATCH_SIZE, shuffle=True)
 
 
-# test_data = torchvision.datasets.MNIST(root='./mnist/', train=False)
+test_data=MyDataset(root=root,datatxt ='id3.txt', transform=transforms.ToTensor())
+test_loader = Data.DataLoader(dataset=test_data, batch_size=45, shuffle=True)
 
 # # !!!!!!!! Change in here !!!!!!!!! #
 # test_x = torch.unsqueeze(test_data.test_data, dim=1).type(torch.FloatTensor)[:2000].cuda()/255.   # Tensor on GPU
@@ -99,7 +101,7 @@ def train():
 
 	
 	
-	model = models.resnet34(pretrained = False)
+	model = models.resnet18(pretrained = False)
 	fc_features = model.fc.in_features
 	model.fc = nn.Linear(fc_features,24)
 
@@ -189,6 +191,33 @@ def train():
 
 	return model
 
+def test(model):
+
+
+	was_training = model.training
+	model.eval()
+
+	running_acc = 0.0
+
+	with torch.no_grad():
+		for i, data in enumerate(test_loader):
+			x, label= data
+			label = list2tensor(label)
+			if (GPU):
+				x = x.to(device)
+				label = label.to(device)
+
+			y = model(x)
+			running_acc += acc(y, label , x.size(0))
+		epoch_acc = running_acc / tesize
+		print('-' * 20)
+		print(' Test Acc: {:.4f}'.format(epoch_acc))
+		model.train(mode=was_training)
+
+
+
 if __name__ == '__main__':
 	model = train()
 	#net.load_state_dict(torch.load('model_para.pkl'))
+	test(model)
+
