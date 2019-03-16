@@ -8,17 +8,22 @@ from dataprocess import *
 from torchvision import models
 import time
 import copy
+from tensorboardX import SummaryWriter
 
-# torch.manual_seed(1)
+
+writer = SummaryWriter(log_dir='scalar')
+
+
+
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 mse = nn.MSELoss()
-EPOCH = 1
+EPOCH = 500
 BATCH_SIZE = 25
-LR = 0.001
+#0.001 0.0003
+LR = 0.0035
 GPU = True
-train_size = 800
-val_size = 50
-
+train_size = 700
+val_size = 175
 
 
 train_data=MyDataset(root=root,datatxt ='id1.txt', transform=transforms.ToTensor())
@@ -52,7 +57,7 @@ class CNN(nn.Module):
 def mseloss(y,label,batch):
 
 	newlabel = label
-	newlabel = torch.reshape(newlabel,(batch,200))
+	newlabel = torch.reshape(newlabel,(batch,16))
 	newlabel = newlabel.to(torch.float)
 	y_n = y.to(torch.float)
 
@@ -72,7 +77,7 @@ def acc(y,label,batch):
 				iousave.append(caliou(newlabel[i,j].detach().cpu().numpy(),y_n[i,k].detach().cpu().numpy()))
 			iousavetotal.append(max(iousave))
 			iousave = []
-		count = len([l for l in iousavetotal if l > 0.75])
+		count = len([l for l in iousavetotal if l > 0.5])
 		total = total + count/newlabel.size(1)*1.0 
 		iousavetotal = []
 
@@ -92,9 +97,9 @@ def train():
 
 	
 	
-	model = models.resnet34(pretrained = True)
+	model = models.resnet34(pretrained = False)
 	fc_features = model.fc.in_features
-	model.fc = nn.Linear(fc_features,200)
+	model.fc = nn.Linear(fc_features,16)
 
 	best_model_wts = copy.deepcopy(model.state_dict())
 
@@ -104,7 +109,7 @@ def train():
 
 	optimizer = optim.Adam(model.parameters(), lr=LR)
 	# Decay LR by a factor of 0.1 every 7 epochs
-	scheduler = lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.00001)
+	scheduler = lr_scheduler.StepLR(optimizer, step_size=75, gamma=0.9)
 
 	for epoch in range(EPOCH):
 		print('Epoch {}/{}'.format(epoch, EPOCH - 1))
@@ -151,13 +156,23 @@ def train():
 
 				print('{} Batch_Loss: {:.4f} Batch_Acc: {:.4f}'.format(phase, batch_loss, batch_acc))
 
+
 			epoch_loss = running_loss / tsize
 			epoch_acc = running_acc / tsize
 			print('{} Loss: {:.4f} Acc: {:.4f}'.format(phase, epoch_loss, epoch_acc))
 
+			if phase =='train':
+				writer.add_scalars('scalar/scalars_train', {'trainloss': epoch_loss, 'trainacc': epoch_acc}, epoch)
+
+			else :
+				writer.add_scalars('scalar/scalars_val', {'valloss': epoch_loss, 'valacc': epoch_acc}, epoch)
+				#writer.add_scalars('scalar/scalars_test', {'xsinx': epoch * np.sin(epoch), 'xcosx': epoch * np.cos(epoch)}, epoch)
+
 			if phase == 'val' and epoch_acc > best_acc:
 				best_acc = epoch_acc
 				best_model_wts = copy.deepcopy(model.state_dict())
+	
+
 
 
 	time_elapsed = time.time() - since
@@ -167,7 +182,11 @@ def train():
 
 	# load best model weights
 	model.load_state_dict(best_model_wts)
+	torch.save(model.state_dict(),'model_para.pkl')
+	writer.close()
+
 	return model
 
 if __name__ == '__main__':
-	train()
+	model = train()
+	#net.load_state_dict(torch.load('model_para.pkl'))
