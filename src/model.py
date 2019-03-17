@@ -23,9 +23,9 @@ BATCH_SIZE = 20
 #0.001 0.0003
 LR = 0.0035
 GPU = True
-train_size = 580
-val_size = 260
-tesize = 45
+train_size = 580*2
+val_size = 260*2
+tesize = 45*2
 
 
 # id1 train id2 val id3 test
@@ -37,7 +37,7 @@ val_loader = Data.DataLoader(dataset=val_data, batch_size=BATCH_SIZE, shuffle=Tr
 
 
 test_data=MyDataset(root=root,datatxt ='id3.txt', transform=transforms.ToTensor())
-test_loader = Data.DataLoader(dataset=test_data, batch_size=45, shuffle=True)
+test_loader = Data.DataLoader(dataset=test_data, batch_size=45*2, shuffle=True)
 
 # # !!!!!!!! Change in here !!!!!!!!! #
 # test_x = torch.unsqueeze(test_data.test_data, dim=1).type(torch.FloatTensor)[:2000].cuda()/255.   # Tensor on GPU
