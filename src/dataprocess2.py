@@ -29,8 +29,8 @@ def list2tensor(labels):
 
 def makeid():
 	with open("id.txt","w") as f:
-		for i in range(54465):
-			a = "{}".format(1 + i)
+		for i in range(1400):
+			a = "{}".format(4001 + i)
 			f.write(a)
 			f.write('\n')
 
@@ -38,7 +38,7 @@ def boxtolabel(labeltxt):
 	boxes = []
 	box = []
 	i = 0
-	j = 0
+	#j = 0
 	with open(labeltxt, 'r') as f:
 		for line in f:
 			line = line.rstrip()
@@ -53,22 +53,14 @@ def boxtolabel(labeltxt):
 			else:
 				# x y th h w
 				box = [float(a[0]),float(a[1]),float(a[4]),float(a[3]),float(a[2])]
-			box = np.int0(box)
-			if i == 0:
-				boxes.append(box)
-				j = j + 1
-			else:
-				if boxes[-1][0] == box[0] and boxes[-1][1] == box[1] and boxes[-1][2]== box[2] and boxes[-1][3]== box[3]:
-					pass
-				else:
-					boxes.append(box)
-					j = j + 1
+			#box = np.int0(box)
+			boxes.append(box)
 
 			i = i + 1
 
 				#print(box)
 				
-	print("Org_boxes %d"%(i))
+	#print("Org_boxes %d"%(i))
 	#print("Fil_boxes %d"%(j))
 	
 	return(boxes)
@@ -104,7 +96,7 @@ def getgridlabel(labels,grid_size = (8,8,6)):
 		for j in range(8):
 			if bboxnew[i,j,0] == 1:
 				total = total + 1
-	print ("Total gridboxes are %d" %(total))
+	#print ("Total gridboxes are %d" %(total))
 
 	return(bboxnew)
 
@@ -116,7 +108,7 @@ class MyDataset(torch.utils.data.Dataset):
 			for line in f:
 				line = line.rstrip()
 				words = line.split()
-				wordsa = words[0] + ".png"
+				wordsa = words[0] + ".jpg"
 				wordsb = words[0] + ".txt"
 				print("Loading %s" %(wordsa))
 				#img label
@@ -127,7 +119,7 @@ class MyDataset(torch.utils.data.Dataset):
 	def __getitem__(self, index):
 		fn, labeltxt = self.imgs[index]
 		img = Image.open(root+fn).convert('RGB')
-		print("Processing %s box" %(labeltxt))
+		#print("Processing %s box" %(labeltxt))
 		label = boxtolabel(root+labeltxt)
 		label = getgridlabel(label,grid_size)
 
