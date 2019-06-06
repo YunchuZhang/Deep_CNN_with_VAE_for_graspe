@@ -29,8 +29,8 @@ def list2tensor(labels):
 
 def makeid():
 	with open("id.txt","w") as f:
-		for i in range(1400):
-			a = "{}".format(4001 + i)
+		for i in range(15000):
+			a = "{}".format(35001 + i)
 			f.write(a)
 			f.write('\n')
 
@@ -67,6 +67,25 @@ def boxtolabel(labeltxt):
 
 #"pcd0"+"{}".format(100 + i) + "r.png"
 #"pcd0"+"{}".format(100 + i) + "cpos.txt"
+def labeltest(add,grid_size = (8,8,6)):
+	total = 0
+	#print(add)
+	bboxnew = torch.zeros(grid_size)
+	with open(add, 'r') as f:
+		for line in f:
+			line = line.rstrip()
+			a = line.split(' ')
+			if float(a[7])>0:
+				bboxnew[np.int0(float(a[0])),np.int0(float(a[1])),:] = torch.tensor([float(a[2]),float(a[3]),float(a[4]),float(a[5]),float(a[6]),float(a[7]) - 90.0])
+			else:
+				bboxnew[np.int0(float(a[0])),np.int0(float(a[1])),:] = torch.tensor([float(a[2]),float(a[3]),float(a[4]),float(a[5]),float(a[6]),float(a[7])])
+	#print(bboxnew)
+	#for i in range (8):
+	#	for j in range(8):
+	#		if bboxnew[i,j,0] == 1:
+	#			total = total + 1
+	#print ("Total gridboxes are %d" %(total))
+	return bboxnew
 
 def getgridlabel(labels,grid_size = (8,8,6)):
 
@@ -108,7 +127,8 @@ class MyDataset(torch.utils.data.Dataset):
 			for line in f:
 				line = line.rstrip()
 				words = line.split()
-				wordsa = words[0] + ".jpg"
+				#jpg
+				wordsa = words[0] + ".png"
 				wordsb = words[0] + ".txt"
 				print("Loading %s" %(wordsa))
 				#img label
@@ -120,8 +140,9 @@ class MyDataset(torch.utils.data.Dataset):
 		fn, labeltxt = self.imgs[index]
 		img = Image.open(root+fn).convert('RGB')
 		#print("Processing %s box" %(labeltxt))
-		label = boxtolabel(root+labeltxt)
-		label = getgridlabel(label,grid_size)
+		#label = boxtolabel(root+labeltxt)
+		#label = getgridlabel(label,grid_size)
+		label = labeltest(root+labeltxt,grid_size)
 
 		if self.transform is not None:
 			img = self.transform(img)
@@ -135,10 +156,10 @@ def test():
 	train_loader = Data.DataLoader(dataset=train_data, batch_size=15, shuffle=False)
 	for i, data in enumerate(train_loader):
 		imgs, labels= data
-		if i==0:
-			#print(labels)
+		#if i==0:
+		print(labels)
 			#newlabel = list2tensor(labels)
-			print(labels.size())
+		print(labels.size())
 			#drawresult(imgs,newlabel,dscale = 1024/640.0)
 			#img = transforms.ToPILImage()(imgs[0])
 			#img.show()

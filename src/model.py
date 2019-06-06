@@ -18,7 +18,7 @@ writer = SummaryWriter(log_dir='scalar')
 #580 260 45
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 mse = nn.MSELoss()
-EPOCH = 650
+EPOCH = 300
 BATCH_SIZE = 20
 #0.001 0.0003
 LR = 0.0035
@@ -81,7 +81,7 @@ def acc(y,label,batch):
 				iousave.append(caliou(newlabel[i,j].detach().cpu().numpy(),y_n[i,k].detach().cpu().numpy()))
 			iousavetotal.append(max(iousave))
 			iousave = []
-		count = len([l for l in iousavetotal if l > 0.5])
+		count = len([l for l in iousavetotal if l > 0.05])
 		total = total + count/newlabel.size(1)*1.0 
 		iousavetotal = []
 
@@ -217,6 +217,10 @@ def test(model):
 
 
 if __name__ == '__main__':
+	#model = models.resnet18(pretrained = False)
+	#fc_features = model.fc.in_features
+	#model.fc = nn.Linear(fc_features,24)
+	#model.load_state_dict(torch.load('model_para0.05.pkl'))
 	model = train()
 	#net.load_state_dict(torch.load('model_para.pkl'))
 	test(model)

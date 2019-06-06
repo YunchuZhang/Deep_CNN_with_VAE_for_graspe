@@ -7,7 +7,7 @@ import numpy as np
 import shapely
 from shapely.geometry import Polygon,MultiPoint
 
-root = '/home/yunchu/Workspace/Deep_CNN_with_VAE_for_graspe/Jacquard_Dataset_Merged/'
+root = '/home/yunchu/Workspace/Deep_CNN_with_VAE_for_graspe/dd/'
 
 def caliou(box1,box2):
 	poly1 = Polygon(box1).convex_hull  #四个点顺序为：左上 左下  右下 右上 左上
@@ -18,21 +18,22 @@ def caliou(box1,box2):
 		iou = 0.0
 	else:
 		iou = poly1.intersection(poly2).area / poly1.union(poly2).area
-	print(iou)
+	#print(iou)
 	return(iou)
 def gridiou(y_n,newlabel,batch):
+	#print(y_n)
 
 	ioutotal = torch.zeros(batch,newlabel.size(1),1)
 	for i in range(batch):
 		for j in range(newlabel.size(1)):
-			box1 = y_n[i,j,:].detach().cpu().numpy()
-			box2 = newlabel[i,j,:].detach().cpu().numpy()
+			box1 = y_n[i,j,:]
+			box2 = newlabel[i,j,:]
 			box1 = decode(box1,j)
 			box2 = decode(box2,j)
 
 			iou = caliou(box1,box2)
 			ioutotal[i,j,:] = iou
-			print(ioutotal)
+	#print(ioutotal)
 
 	return ioutotal
 
@@ -61,10 +62,11 @@ def change():
 			line = line.rstrip()
 			words = line.split()
 			wordsa = words[0] + ".png"
+			wordsb = words[0] + ".jpg"
 			print(wordsa)
 			img = cv2.imread(root+"{}".format(wordsa)) 
-			img = cv2.resize(img, dsize=(640, 640))
-			cv2.imwrite("/home/yunchu/Workspace/Deep_CNN_with_VAE_for_graspe/a/"+"{}".format(wordsa), img)
+			#img = cv2.resize(img, dsize=(640, 640))
+			cv2.imwrite("/home/yunchu/Workspace/Deep_CNN_with_VAE_for_graspe/a/"+"{}".format(wordsb), img)
 			cv2.destroyAllWindows()
 
 
@@ -118,3 +120,53 @@ def drawresult(imgs,labels,dscale):
 
 if __name__ == '__main__':
 	change()
+
+
+
+
+
+
+
+
+
+'''
+	for r in range(batch):
+		for c in range(64):
+
+			if wp[r,c] < 0:
+				
+				lossw = lossw + (torch.sqrt(wl[r,c]) - torch.sqrt(-wp[r,c]))**2
+
+			else:
+
+				lossw = lossw + (torch.sqrt(wl[r,c]) - torch.sqrt(wp[r,c]))**2
+
+			if hp[r,c] < 0:
+				
+				lossh = lossh + (torch.sqrt(hl[r,c]) - torch.sqrt(-hp[r,c]))**2
+
+			else:
+
+				lossh = lossh + (torch.sqrt(hl[r,c]) - torch.sqrt(hp[r,c]))**2
+	lossw = lossw * lambda_coord
+	lossh = lossh * lambda_coord
+'''
+'''
+	ilist, jlist = np.where(newlabel[:, :, 0].detach().cpu().numpy() == 1)
+	for r, c in zip(ilist, jlist):
+
+		if wp[r,c] < 0:
+			
+			lossw = lossw + (torch.sqrt(wl[r,c]) + torch.sqrt(-wp[r,c]))**2
+
+		else:
+
+			lossw = lossw + (torch.sqrt(wl[r,c]) - torch.sqrt(wp[r,c]))**2
+
+		if hp[r,c] < 0:
+			
+			lossh = lossh + (torch.sqrt(hl[r,c]) + torch.sqrt(-hp[r,c]))**2
+
+		else:
+			lossh = lossh + (torch.sqrt(hl[r,c]) - torch.sqrt(hp[r,c]))**2
+'''

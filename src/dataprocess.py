@@ -11,7 +11,7 @@ import shapely
 from shapely.geometry import Polygon,MultiPoint
 from img import imgshow,caliou
 
-root = '/home/yunchu/Workspace/Deep_CNN_with_VAE_for_graspe/data2/'
+root = '/home/yunchu/Workspace/Deep_CNN_with_VAE_for_graspe/datah/'
 def list2tensor(labels):
 	label = torch.zeros([len(labels),labels[0].shape[0],4,2])
 	for k in range(len(labels)):
@@ -82,7 +82,7 @@ def test():
 			newlabel = list2tensor(labels)
 			print(newlabel)
 			print(newlabel.size())
-			caliou(newlabel[0,1].numpy(),newlabel[0,2].numpy())
+			print(caliou(newlabel[0,1],newlabel[0,2]))
 			print(imgs.size())
 			img = transforms.ToPILImage()(imgs[0])
 			#img.show()
