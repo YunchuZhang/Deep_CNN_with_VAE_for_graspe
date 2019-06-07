@@ -8,4 +8,5 @@ Dataset link http://pr.cs.cornell.edu/grasping/rect_data/data.php
   Adding sigmoid at the end of grasp-net's end for regulation(range of (-1,1))  
   
   Add information cut from the useful part to the network could increase accuracy.
-![image](https://github.com/YunchuZhang/Deep_CNN_with_VAE_for_graspe/blob/master/result/a.png)
+![image](https://github.com/YunchuZhang/Deep_CNN_with_VAE_for_graspe/blob/master/result/b.png)
+![image](https://github.com/YunchuZhang/Deep_CNN_with_VAE_for_graspe/blob/master/result/tb.png)
